@@ -1,13 +1,27 @@
-const axios = require("axios");
+const express = require("express");
+const app = express();
+
 const cheerio = require("cheerio");
+const got = require("got");
 
-async function fetchHTML(url) {
-  const { data } = await axios.get(url);
-  return cheerio.load(data);
-}
-const ch = fetchHTML("https://www.eyeem.com/u/laudebugs");
+const url = "https://www.eyeem.com/u/laudebugs";
 
-// Print the full HTML
-console.log(`Site HTML: ${ch.html()}\n\n`);
+app.get("/randomImage", (req, res) => {
+  got(url)
+    .then((response) => {
+      const $ = cheerio.load(response.body);
+      const images = $("figure a img");
 
-// Print some specific page content
+      const no_images = $("figure a img").length;
+      const randomNo = Math.floor(Math.random() * no_images + 1);
+      // select a random number between 0 and no_images-1
+      res.json({
+        link: images[randomNo].attribs.src,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+app.listen(process.env.PORT || 4000, () => console.log("Server is running..."));
