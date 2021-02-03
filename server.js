@@ -183,7 +183,9 @@ app.get("/randomImage", (req, res) => {
       console.log(err);
     });
 });
-
+app.get("*", (req, res) => {
+  res.send("welcome to lau de bugs's api");
+});
 /**
  * Posts a request to delete any identifying information for a user - email, name, comments
  */
