@@ -1,6 +1,7 @@
 const express = require("express");
 // create the express app
 const app = express();
+const cors = require("cors");
 
 const path = require("path");
 const bodyParser = require("body-parser");
@@ -20,10 +21,37 @@ app.use(express.static(publicPath));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+/**
+ * Configure cors headers
+ * Reference: https://stackoverflow.com/questions/51017702/enable-cors-in-fetch-api
+ */
+app.use((req, res, next) => {
+  const allowedOrigins = ["http://laudebugs.me", "http://localhost:3000"];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
+  res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", true);
+  return next();
+});
+
 const Post = mongoose.model("Post");
 const User = mongoose.model("User");
 const Comment = mongoose.model("Comment");
 
+app.all("/", function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+});
+/**
+ * Return all the podcasts with their likes
+ * TODO: Implement
+ */
+app.get("/allpostdata", (req, res) => {});
 /**
  * Gets the comments on a specific post
  */
@@ -118,7 +146,7 @@ app.get("/likes/:slug", async (req, res) => {
   const slug = req.params.slug;
   console.log(slug);
   try {
-    const post = await Post.findOne({ slug: slug });
+    let post = await Post.findOne({ slug: slug });
     if (post !== null) {
       res.json({ likes: post.likes });
     } else {
@@ -143,9 +171,9 @@ app.get("/likes/:slug", async (req, res) => {
  */
 app.post("/like", async (req, res) => {
   let slug = req.body.slug;
-
+  console.log(req.body);
   try {
-    const post = await Post.findOne({ slug: slug });
+    let post = await Post.findOne({ slug: slug });
     if (post === null) {
       post = new Post({
         slug: slug,
@@ -157,6 +185,7 @@ app.post("/like", async (req, res) => {
       res.json({ likes: post.likes });
     });
   } catch (error) {
+    console.log(error.message);
     res.json({ likes: -1 });
   }
 });
