@@ -6,6 +6,8 @@ const cors = require("cors");
 const path = require("path");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const imageToBase64 = require("image-to-base64");
+var multer = require("multer");
 const publicPath = path.resolve(__dirname, "public");
 
 /**
@@ -26,13 +28,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
  * Reference: https://stackoverflow.com/questions/51017702/enable-cors-in-fetch-api
  */
 app.use((req, res, next) => {
-  const allowedOrigins = ["http://laudebugs.me", "http://localhost:3000"];
+  const allowedOrigins = [
+    "http://laudebugs.me",
+    "http://localhost:3000",
+    "http://192.168.1.26:3000",
+  ];
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
   //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
   res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Credentials", true);
   return next();
@@ -41,6 +48,7 @@ app.use((req, res, next) => {
 const Post = mongoose.model("Post");
 const User = mongoose.model("User");
 const Comment = mongoose.model("Comment");
+const Image = mongoose.model("Image");
 
 app.all("/", function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -51,41 +59,71 @@ app.all("/", function (req, res, next) {
  * Return all the podcasts with their likes
  * TODO: Implement
  */
-app.get("/allpostdata", (req, res) => {});
+app.get("/allpostdata", async (req, res) => {
+  let allPosts = await Post.find();
+  console.log(allPosts);
+  res.json({ data: allPosts });
+});
 /**
  * Gets the comments on a specific post
  */
-app.get("/comments/:slug", async (req, res) => {
-  const slug = req.params.slug;
-  console.log(slug);
+app.get("/comments", async (req, res) => {
+  const slug = req.query.slug;
   try {
-    const post = await Post.findOne({ slug: slug });
+    let post = await Post.findOne({ slug: slug });
     if (post !== null) {
       const getComments = await Promise.all(
         post.comments.map(async (commentId) => {
           return await Comment.findById(commentId);
         })
       );
-      res.json({ comments: getComments });
+      const commentsWitData = await Promise.all(
+        getComments.map(async (comment) => {
+          let thisUser = await User.findById(comment.user);
+          commentUser = thisUser.name;
+
+          return {
+            content: comment.content,
+            approved: comment.approved,
+            createdAt: comment.createdAt,
+            user: commentUser,
+          };
+        })
+      );
+      res.json({ comments: commentsWitData, slug: slug });
     } else {
       /**
        * Post is not created??
        * TODO: Find the cases where this happens
        */
-      res.json({ comments: [] });
+      post = new Post({
+        slug: slug,
+        comments: [],
+        likes: 0,
+      });
+      post.save().then(() => {
+        res.json({ comments: [], slug: slug });
+      });
     }
   } catch (error) {
-    res.json({ commments: [] });
+    console.log(error.message);
+    res.json({ commments: [], slug: slug });
   }
 });
+
 /**
  * Posts a comment to a specific post
  */
 app.post("/comment", async (req, res) => {
+  console.log(req.body);
   const data = req.body;
   /**
    * Find the User, if they don't exist,
    * create a new user
+   *
+   * TODO: Find out how to moderate the comments and approve comments for users who have previously
+   * had comments approved
+   *
    */
   try {
     let post = await Post.findOne({ slug: data.slug });
@@ -100,15 +138,24 @@ app.post("/comment", async (req, res) => {
     console.log(post);
     let currentUser = await User.findOne({ email: data.email });
     if (currentUser === null) {
+      let userName = data.name;
+      if (data.name.length == 0) {
+        let atIndx = data.email.indexOf("@");
+        userName = data.email.substring(0, atIndx);
+        console.log(userName);
+      }
       currentUser = new User({
-        name: data.name,
+        name: userName,
         email: data.email,
       });
     }
+    console.log("Comment -> " + data.comment);
     const newComment = new Comment({
       content: data.comment,
       user: currentUser._id,
       likes: 0,
+      approved: false,
+      moderated: false,
     });
     post.comments.push(newComment._id);
     currentUser.comments.push(newComment._id);
@@ -123,6 +170,7 @@ app.post("/comment", async (req, res) => {
       )
     );
   } catch (error) {
+    console.log(error.message);
     /**
      * If an error occurs
      */
@@ -189,7 +237,19 @@ app.post("/like", async (req, res) => {
     res.json({ likes: -1 });
   }
 });
+/**
+ * Image proxy link
+ */
 
+app.get(`/photo`, function (req, res) {
+  imageToBase64(req.query.link) // Image URL
+    .then((response) => {
+      res.json({ image: response });
+    })
+    .catch((error) => {
+      console.log(error); // Logs an error if there was one
+    });
+});
 /**
  * Gets a random EyeEm image
  */
