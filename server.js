@@ -10,6 +10,7 @@ const imageToBase64 = require("image-to-base64");
 var multer = require("multer");
 const publicPath = path.resolve(__dirname, "public");
 
+app.use(cors());
 /**
  * Cheerio and got are used to parse EyeEm photos by webscraping my user profile
  */
