@@ -39,37 +39,11 @@ const User = mongoose.model("User");
 const Comment = mongoose.model("Comment");
 const Image = mongoose.model("Image");
 
-/**
- * Configure cors headers
- * Reference: https://stackoverflow.com/questions/51017702/enable-cors-in-fetch-api
- */
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    "https://laudebugs.me/#/",
-    "http://localhost:3000",
-    "http://192.168.1.26:3000",
-  ];
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-  //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
-  res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", true);
-  return next();
-});
-
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://laudebugs.me"); // update to match the domain you will make the request from
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
+app.all("/", function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
 });
-
 /**
  * Return all the podcasts with their likes
  * TODO: Implement
