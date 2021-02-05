@@ -30,7 +30,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
  */
 app.use((req, res, next) => {
   const allowedOrigins = [
-    "http://laudebugs.me",
+    "https://laudebugs.me/#/",
     "http://localhost:3000",
     "http://192.168.1.26:3000",
   ];
@@ -44,6 +44,15 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Credentials", true);
   return next();
+});
+
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "https://laudebugs.me"); // update to match the domain you will make the request from
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
 });
 
 const Post = mongoose.model("Post");
