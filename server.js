@@ -241,8 +241,10 @@ app.post("/like", async (req, res) => {
  * Image proxy link
  */
 
-app.get(`/photo`, function (req, res) {
-  imageToBase64(req.query.link) // Image URL
+app.post(`/photo`, function (req, res) {
+  let url = req.body.link;
+
+  imageToBase64(url) // Image URL
     .then((response) => {
       res.json({ image: response });
     })
