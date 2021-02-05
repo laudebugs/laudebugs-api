@@ -39,11 +39,37 @@ const User = mongoose.model("User");
 const Comment = mongoose.model("Comment");
 const Image = mongoose.model("Image");
 
-app.all("/", function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+/**
+ * Configure cors headers
+ * Reference: https://stackoverflow.com/questions/51017702/enable-cors-in-fetch-api
+ */
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    "https://laudebugs.me/#/",
+    "http://localhost:3000",
+    "http://192.168.1.26:3000",
+  ];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
+  res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", true);
+  return next();
+});
+
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "https://laudebugs.me"); // update to match the domain you will make the request from
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
   next();
 });
+
 /**
  * Return all the podcasts with their likes
  * TODO: Implement
@@ -244,6 +270,28 @@ app.post(`/photo`, function (req, res) {
 /**
  * Gets a random EyeEm image
  */
+app.get("/allposts", (req, res) => {
+  const client = require("contentful").createClient({
+    space: "rnmht6wsj5nl",
+    accessToken: "_AsjIH6r4ph08uPsSxi_61X8pBSjVP_PSOKOBXpObCM",
+  });
+  const getAllPosts = () =>
+    client.getEntries().then(async (response) => {
+      let posts = response.items;
+      const getPosts = await Promise.all(
+        posts.map(async (post) => {
+          let base64 = await imageToBase64(
+            "https:" + post.fields.feature_image.fields.file.url
+          ); // Image URL
+          post.fields.feature_image.fields.file.url =
+            "data:image/jpeg;base64," + base64;
+          return post;
+        })
+      );
+      res.json({ posts: getPosts });
+    });
+  getAllPosts();
+});
 app.get("/randomImage", (req, res) => {
   const url = "https://www.eyeem.com/u/laudebugs";
 
