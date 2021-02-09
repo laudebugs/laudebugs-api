@@ -10,6 +10,7 @@
     "cors": "^2.8.5",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
+    "feed": "^4.2.2",
     "got": "^11.8.1",
     "image-to-base64": "^2.1.1",
     "mongoose": "^5.11.14",

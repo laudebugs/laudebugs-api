@@ -7,7 +7,7 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const imageToBase64 = require("image-to-base64");
-var multer = require("multer");
+const feed = require("feed");
 const publicPath = path.resolve(__dirname, "public");
 
 app.use(cors());
@@ -24,25 +24,26 @@ app.use(express.static(publicPath));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const Post = mongoose.model("Post");
+const User = mongoose.model("User");
+const Comment = mongoose.model("Comment");
+const Note = mongoose.model("Note");
+
 /**
  * Configure cors headers
  * Reference: https://stackoverflow.com/questions/51017702/enable-cors-in-fetch-api
  */
-app.all("/", function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
-});
-
-const Post = mongoose.model("Post");
-const User = mongoose.model("User");
-const Comment = mongoose.model("Comment");
-const Image = mongoose.model("Image");
-
-app.all("/", function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
+app.use((req, res, next) => {
+  const allowedOrigins = ["http://laudebugs.me", "http://localhost:3000"];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
+  res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", true);
+  return next();
 });
 /**
  * Return all the podcasts with their likes
@@ -79,7 +80,10 @@ app.get("/comments", async (req, res) => {
           };
         })
       );
-      res.json({ comments: commentsWitData, slug: slug });
+      res.json({
+        comments: commentsWitData.filter((comment) => comment.approved),
+        slug: slug,
+      });
     } else {
       /**
        * Post is not created??
@@ -99,7 +103,6 @@ app.get("/comments", async (req, res) => {
     res.json({ commments: [], slug: slug });
   }
 });
-
 /**
  * Posts a comment to a specific post
  */
@@ -107,7 +110,8 @@ app.post("/comment", async (req, res) => {
   console.log(req.body);
   const data = req.body;
   /**
-   * Find the User, if they don't exist,
+   * Find the User, if they don't
+   *  exist,
    * create a new user
    *
    * TODO: Find out how to moderate the comments and approve comments for users who have previously
@@ -127,10 +131,13 @@ app.post("/comment", async (req, res) => {
     console.log(post);
     let currentUser = await User.findOne({ email: data.email });
     if (currentUser === null) {
-      let userName = data.name;
-      if (data.name.length == 0) {
+      let userName;
+      if (!data.name) {
         let atIndx = data.email.indexOf("@");
         userName = data.email.substring(0, atIndx);
+        console.log(userName);
+      } else {
+        userName = data.name;
         console.log(userName);
       }
       currentUser = new User({
@@ -167,6 +174,79 @@ app.post("/comment", async (req, res) => {
   }
 });
 
+/**
+ * User sending a note, suggestion
+ */
+app.post("/note", async (req, res) => {
+  const note = req.body;
+  console.log(note);
+  try {
+    let usr = await User.findOne({ email: note.email });
+    if (!usr) {
+      usr = new User({ name: note.name, email: note.email });
+    }
+    let newNote = new Note({
+      subject: note.subject,
+      note: note.note,
+      user: usr._id,
+    });
+
+    usr.notes.push(newNote._id);
+
+    usr.save().then(() => {
+      newNote.save().then(() => {
+        res.json({ posted: true });
+      });
+    });
+  } catch (error) {
+    res.json({ posted: false });
+  }
+});
+
+/**
+ * User signing up for newsletter
+ */
+app.post("/signup", async (req, res) => {
+  let user = req.body;
+  try {
+    let usr = await User.findOne({ email: user.email });
+    if (!usr) {
+      usr = new User({ name: user.name, email: user.email });
+    }
+
+    usr.sneekpeeks = user.sneekpeeks;
+    usr.newposts = user.newposts;
+
+    usr.save().then(() => {
+      res.json({ saved: true });
+    });
+  } catch (error) {
+    res.json({ saved: false });
+  }
+});
+app.get("/feed", (req, res) => {
+  const feed = new Feed({
+    title: "Feed Title",
+    description: "This is my personal feed!",
+    id: "http://example.com/",
+    link: "http://example.com/",
+    language: "en", // optional, used only in RSS 2.0, possible values: http://www.w3.org/TR/REC-html40/struct/dirlang.html#langcodes
+    image: "http://example.com/image.png",
+    favicon: "http://example.com/favicon.ico",
+    copyright: "All rights reserved 2013, John Doe",
+    updated: new Date(2013, 6, 14), // optional, default = today
+    generator: "awesome", // optional, default = 'Feed for Node.js'
+    feedLinks: {
+      json: "https://example.com/json",
+      atom: "https://example.com/atom",
+    },
+    author: {
+      name: "John Doe",
+      email: "johndoe@example.com",
+      link: "https://example.com/johndoe",
+    },
+  });
+});
 /**
  * Gets a user details - Name, email, comments ids
  */
@@ -251,7 +331,9 @@ app.get("/allposts", (req, res) => {
   });
   const getAllPosts = () =>
     client.getEntries().then(async (response) => {
-      let posts = response.items;
+      const posts = response.items.sort(function (a, b) {
+        return new Date(b.fields.date) - new Date(a.fields.date);
+      });
       const getPosts = await Promise.all(
         posts.map(async (post) => {
           let base64 = await imageToBase64(
@@ -262,7 +344,7 @@ app.get("/allposts", (req, res) => {
           return post;
         })
       );
-      res.json({ posts: getPosts });
+      res.json({ posts: posts });
     });
   getAllPosts();
 });
@@ -284,6 +366,29 @@ app.get("/randomImage", (req, res) => {
     .catch((err) => {
       console.log(err);
     });
+});
+app.get("/unapprovedComments", async (req, res) => {
+  try {
+    let unapprovedComments = await Comment.find({ approved: false });
+    res.json({ comments: unapprovedComments });
+  } catch (error) {
+    console.log(error.message);
+    res.json({ comments: [] });
+  }
+});
+app.post("/approvecomment", async (req, res) => {
+  const id = req.body.id;
+  try {
+    const comment = await Comment.findById(id);
+    comment.approved = true;
+    comment.moderated = true;
+    comment.save().then(() => {
+      console.log("saved");
+      res.json({ saved: true });
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
 });
 app.get("*", (req, res) => {
   res.send("welcome to lau de bugs's api");
