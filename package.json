@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "@contentful/rich-text-html-renderer": "^14.1.2",
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.5",
     "contentful": "^8.1.7",

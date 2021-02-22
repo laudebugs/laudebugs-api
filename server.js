@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const imageToBase64 = require("image-to-base64");
 const feed = require("feed");
 const publicPath = path.resolve(__dirname, "public");
+const { documentToHtmlString } = require("@contentful/rich-text-html-renderer");
 
 app.use(cors());
 /**
@@ -348,6 +349,33 @@ app.get("/allposts", (req, res) => {
     });
   getAllPosts();
 });
+app.get("/allrenderedposts", (req, res) => {
+  const client = require("contentful").createClient({
+    space: "rnmht6wsj5nl",
+    accessToken: "_AsjIH6r4ph08uPsSxi_61X8pBSjVP_PSOKOBXpObCM",
+  });
+  const getAllPosts = () =>
+    client.getEntries().then(async (response) => {
+      const posts = response.items.sort(function (a, b) {
+        return new Date(b.fields.date) - new Date(a.fields.date);
+      });
+      const getPosts = await Promise.all(
+        posts.map(async (post) => {
+          let base64 = await imageToBase64(
+            "https:" + post.fields.feature_image.fields.file.url
+          ); // Image URL
+          post.fields.feature_image.fields.file.url =
+            "data:image/jpeg;base64," + base64;
+          post.fields.body = documentToHtmlString(post.fields.body);
+
+          return post;
+        })
+      );
+      res.json({ posts: posts });
+    });
+  getAllPosts();
+});
+
 app.get("/randomImage", (req, res) => {
   const url = "https://www.eyeem.com/u/laudebugs";
 
