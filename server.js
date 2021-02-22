@@ -335,16 +335,16 @@ app.get("/allposts", (req, res) => {
       const posts = response.items.sort(function (a, b) {
         return new Date(b.fields.date) - new Date(a.fields.date);
       });
-      const getPosts = await Promise.all(
-        posts.map(async (post) => {
-          let base64 = await imageToBase64(
-            "https:" + post.fields.feature_image.fields.file.url
-          ); // Image URL
-          post.fields.feature_image.fields.file.url =
-            "data:image/jpeg;base64," + base64;
-          return post;
-        })
-      );
+      // const getPosts = await Promise.all(
+      posts.map(async (post) => {
+        // let base64 = await imageToBase64(
+        //   "https:" + post.fields.feature_image.fields.file.url
+        // ); // Image URL
+        post.fields.feature_image.fields.file.url =
+          "data:image/jpeg;base64," + base64;
+        return post;
+      });
+      // );
       res.json({ posts: posts });
     });
   getAllPosts();
@@ -388,6 +388,7 @@ app.get("/randomImage", (req, res) => {
       console.log(err);
     });
 });
+
 app.get("/unapprovedComments", async (req, res) => {
   try {
     let unapprovedComments = await Comment.find({ approved: false });
@@ -397,6 +398,7 @@ app.get("/unapprovedComments", async (req, res) => {
     res.json({ comments: [] });
   }
 });
+
 app.post("/approvecomment", async (req, res) => {
   const id = req.body.id;
   try {
