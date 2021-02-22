@@ -360,9 +360,6 @@ app.get("/allrenderedposts", (req, res) => {
         return new Date(b.fields.date) - new Date(a.fields.date);
       });
       posts.map((post) => {
-        let base64 = await imageToBase64(
-          "https:" + post.fields.feature_image.fields.file.url
-        ); // Image URL
         post.fields.body = documentToHtmlString(post.fields.body);
 
         return post;
