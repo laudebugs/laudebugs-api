@@ -359,18 +359,14 @@ app.get("/allrenderedposts", (req, res) => {
       const posts = response.items.sort(function (a, b) {
         return new Date(b.fields.date) - new Date(a.fields.date);
       });
-      const getPosts = await Promise.all(
-        posts.map(async (post) => {
-          let base64 = await imageToBase64(
-            "https:" + post.fields.feature_image.fields.file.url
-          ); // Image URL
-          post.fields.feature_image.fields.file.url =
-            "data:image/jpeg;base64," + base64;
-          post.fields.body = documentToHtmlString(post.fields.body);
+      posts.map((post) => {
+        let base64 = await imageToBase64(
+          "https:" + post.fields.feature_image.fields.file.url
+        ); // Image URL
+        post.fields.body = documentToHtmlString(post.fields.body);
 
-          return post;
-        })
-      );
+        return post;
+      });
       res.json({ posts: posts });
     });
   getAllPosts();
