@@ -10,7 +10,8 @@ const imageToBase64 = require("image-to-base64");
 const feed = require("feed");
 const publicPath = path.resolve(__dirname, "public");
 const { documentToHtmlString } = require("@contentful/rich-text-html-renderer");
-
+import schema from "./schema";
+const { graphqlHTTP } = require("express-graphql");
 app.use(cors());
 /**
  * Cheerio and got are used to parse EyeEm photos by webscraping my user profile
@@ -34,6 +35,8 @@ const Note = mongoose.model("Note");
  * Configure cors headers
  * Reference: https://stackoverflow.com/questions/51017702/enable-cors-in-fetch-api
  */
+const root = { hello: () => "GraphQL is amazing" };
+
 app.use((req, res, next) => {
   const allowedOrigins = ["http://laudebugs.me", "http://localhost:3000"];
   const origin = req.headers.origin;
@@ -46,6 +49,14 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", true);
   return next();
 });
+app.use(
+  "/graphql",
+  graphqlHTTP({
+    schema: schema,
+    // rootValue: root,
+    graphiql: true,
+  })
+);
 /**
  * Return all the podcasts with their likes
  * TODO: Implement
@@ -335,20 +346,41 @@ app.get("/allposts", (req, res) => {
       const posts = response.items.sort(function (a, b) {
         return new Date(b.fields.date) - new Date(a.fields.date);
       });
-      // const getPosts = await Promise.all(
       posts.map(async (post) => {
-        // let base64 = await imageToBase64(
-        //   "https:" + post.fields.feature_image.fields.file.url
-        // ); // Image URL
         post.fields.feature_image.fields.file.url =
           "data:image/jpeg;base64," + base64;
         return post;
       });
-      // );
       res.json({ posts: posts });
     });
   getAllPosts();
 });
+
+app.get("/allpostsplus", (req, res) => {
+  const client = require("contentful").createClient({
+    space: "rnmht6wsj5nl",
+    accessToken: "_AsjIH6r4ph08uPsSxi_61X8pBSjVP_PSOKOBXpObCM",
+  });
+  const getAllPosts = () =>
+    client.getEntries().then(async (response) => {
+      const posts = response.items.sort(function (a, b) {
+        return new Date(b.fields.date) - new Date(a.fields.date);
+      });
+      const getPosts = await Promise.all(
+        posts.map(async (post) => {
+          let base64 = await imageToBase64(
+            "https:" + post.fields.feature_image.fields.file.url
+          ); // Image URL
+          post.fields.feature_image.fields.file.url =
+            "data:image/jpeg;base64," + base64;
+          return post;
+        })
+      );
+      res.json({ posts: getPosts });
+    });
+  getAllPosts();
+});
+
 app.get("/allrenderedposts", (req, res) => {
   const client = require("contentful").createClient({
     space: "rnmht6wsj5nl",
@@ -420,4 +452,5 @@ app.get("*", (req, res) => {
  * Posts a request to delete any identifying information for a user - email, name, comments
  */
 app.post("/deleterequest", (req, res) => {});
-app.listen(process.env.PORT || 4000, () => console.log("Server is running..."));
+const port = 8080;
+app.listen(port, () => console.log(`Server is running on port ${port}`));
