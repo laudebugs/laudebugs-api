@@ -45,6 +45,10 @@ const typeDefs = `
         likes: Int
     }
     
+    type RandomImage {
+        url: String
+    }
+    
     input UserInput {
         id: ID
         name: String
@@ -78,7 +82,8 @@ const typeDefs = `
         getPost: Post
         getLikes (slug: String!): Int
         getBlogPosts: [BlogPost]
-        getRandomImage: String
+        getRandomImage: RandomImage
+        getUnapprovedComments: [Comment]
     }
 
     type Mutation {

@@ -51,13 +51,13 @@ export const resolvers = {
           const commentsWitData = await Promise.all(
             getComments.map(async (comment) => {
               let thisUser = await User.findById(comment.user);
-              commentUser = thisUser.name;
+              let commentUser = thisUser.name;
 
               return {
                 content: comment.content,
                 approved: comment.approved,
                 createdAt: comment.createdAt,
-                user: commentUser,
+                user: { name: commentUser },
               };
             })
           );
@@ -76,6 +76,17 @@ export const resolvers = {
           return post.comments;
         }
       } catch (error) {
+        console.log(error.message);
+        return [];
+      }
+    },
+    getUnapprovedComments: async () => {
+      try {
+        let unapprovedComments = await Comment.find({ approved: false });
+
+        return unapprovedComments;
+      } catch (error) {
+        console.log(error.message);
         return [];
       }
     },
@@ -83,8 +94,9 @@ export const resolvers = {
     getLikes: async (root, { slug }) => {
       try {
         let post = await Post.findOne({ slug: slug });
+
         if (post !== null) {
-          res.json({ likes: post.likes });
+          return post.likes;
         } else {
           post = new Post({
             slug: slug,
@@ -102,7 +114,8 @@ export const resolvers = {
       }
     },
     getRandomImage: async () => {
-      return await getRandomImage();
+      let image = await getRandomImage();
+      return { url: image };
     },
   },
   Mutation: {
