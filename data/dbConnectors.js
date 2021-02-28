@@ -10,10 +10,13 @@ const conf = JSON.parse(data);
 let dbconf = conf.dbconf;
 
 // connect to the database
-mongoose.connect(dbconf, { useNewUrlParser: true, useUnifiedTopology: true });
-mongoose.set("useNewUrlParser", true);
-mongoose.set("useFindAndModify", false);
-mongoose.set("useCreateIndex", true);
+mongoose.connect(dbconf, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true,
+});
+
 // Define the Schemas to be used in the database
 const PostSchema = new Schema({
   slug: {

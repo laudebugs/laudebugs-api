@@ -1,26 +1,30 @@
-const express = require("express");
+import express from "express";
 // create the express app
-const app = express();
-const cors = require("cors");
+import cors from "cors";
 
-const path = require("path");
-const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
-const imageToBase64 = require("image-to-base64");
-const feed = require("feed");
+import path from "path";
+import bodyParser from "body-parser";
+import mongoose from "mongoose";
+import imageToBase64 from "image-to-base64";
+import feed from "feed";
+import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
+import { graphqlHTTP } from "express-graphql";
+import cheerio from "cheerio";
+import got from "got";
+
+import { schema } from "./data/schema";
+
+const app = express();
+
 const publicPath = path.resolve(__dirname, "public");
-const { documentToHtmlString } = require("@contentful/rich-text-html-renderer");
-import schema from "./schema";
-const { graphqlHTTP } = require("express-graphql");
+
 app.use(cors());
 /**
  * Cheerio and got are used to parse EyeEm photos by webscraping my user profile
  */
-const cheerio = require("cheerio");
-const got = require("got");
 
 const { Db } = require("mongodb");
-require("./lib/db");
+require("./data/dbConnectors");
 // Add middleware
 app.use(express.static(publicPath));
 app.use(bodyParser.json());
@@ -49,11 +53,12 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", true);
   return next();
 });
+
 app.use(
   "/graphql",
   graphqlHTTP({
     schema: schema,
-    // rootValue: root,
+    rootValue: root,
     graphiql: true,
   })
 );
