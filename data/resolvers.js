@@ -2,7 +2,7 @@ import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 
 import { Post, User, Note, Comment } from "./dbConnectors";
 import { getAllPosts } from "../lib/contentful";
-import { getRandomImage } from "../lib/functions";
+import { getRandomImage, readableDate } from "../lib/functions";
 // Resolver map
 export const resolvers = {
   Query: {
@@ -27,10 +27,12 @@ export const resolvers = {
           title: post.fields.title,
           description: post.fields.description,
           body: post.fields.body,
-          date: post.fields.date,
+          date: readableDate(post.fields.date),
           featuredImage: post.fields.feature_image.fields.file.url,
-          section: post.fields.tags,
-          tags: post.fields.section,
+          tags: post.fields.tags || [],
+          section: post.fields.section || [],
+          likeLevel: 0,
+          type: post.sys.contentType.sys.id,
         };
       });
       return data;
@@ -56,7 +58,7 @@ export const resolvers = {
               return {
                 content: comment.content,
                 approved: comment.approved,
-                createdAt: comment.createdAt,
+                createdAt: readableDate(comment.createdAt),
                 user: { name: commentUser },
               };
             })
@@ -135,16 +137,6 @@ export const resolvers = {
       });
     },
     createComment: async (root, { data }) => {
-      /**
-       * Find the User, if they don't
-       *  exist,
-       * create a new user
-       *
-       * TODO: Find out how to moderate the comments and approve comments for users who have previously
-       * had comments approved
-       *
-       */
-      console.log(data);
       try {
         let post = await Post.findOne({ slug: data.slug });
         if (post === null) {
@@ -155,7 +147,6 @@ export const resolvers = {
           });
         }
         // TODO: Save current Post later
-        console.log(post);
         let currentUser = await User.findOne({ email: data.email });
         if (currentUser === null) {
           let userName;
@@ -172,7 +163,6 @@ export const resolvers = {
             email: data.email,
           });
         }
-        console.log("Comment -> " + data.comment);
         const newComment = new Comment({
           content: data.comment,
           user: currentUser._id,
@@ -234,6 +224,7 @@ export const resolvers = {
       }
     },
     postLike: async (root, { slug }) => {
+      console.log(slug);
       try {
         let post = await Post.findOne({ slug: slug });
         if (post === null) {

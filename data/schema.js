@@ -24,12 +24,14 @@ const typeDefs = `
         user: User
         approved: Boolean
         moderated: Boolean
+        createdAt: String
     }
     type Post {
         id: ID
         slug: String
         likes: Int
         comments: [Comment]
+
     }
 
     type BlogPost {
@@ -43,6 +45,8 @@ const typeDefs = `
         tags: [String]
         comments: [Comment]
         likes: Int
+        likeLevel: Int
+        type: String
     }
     
     type RandomImage {
