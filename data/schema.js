@@ -63,10 +63,10 @@ const typeDefs = `
         user: UserInput
     }
     input CommentInput {
-        content: String
-        user: UserInput
-        approved: Boolean
-        moderated: Boolean
+        comment: String
+        email: String
+        name: String
+        slug: String
     }
     input PostInput {
         slug: String

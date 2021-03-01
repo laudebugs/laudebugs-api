@@ -144,6 +144,7 @@ export const resolvers = {
        * had comments approved
        *
        */
+      console.log(data);
       try {
         let post = await Post.findOne({ slug: data.slug });
         if (post === null) {
