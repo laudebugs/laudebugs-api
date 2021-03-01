@@ -1,8 +1,24 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const emailValidator = require("email-validator");
+// import the configuration file for the mongodb database
+const fs = require("fs");
+const fn = "src/config.json";
+const data = fs.readFileSync(fn);
 
-const Post = new Schema({
+const conf = JSON.parse(data);
+let dbconf = conf.dbconf;
+
+// connect to the database
+mongoose.connect(dbconf, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true,
+});
+
+// Define the Schemas to be used in the database
+const PostSchema = new Schema({
   slug: {
     type: String,
     required: true,
@@ -11,7 +27,7 @@ const Post = new Schema({
   likes: Number,
   comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
 });
-const Comment = new Schema(
+const CommentSchema = new Schema(
   {
     content: String,
     user: { type: Schema.ObjectId, ref: "User" },
@@ -23,12 +39,12 @@ const Comment = new Schema(
     timestamps: true,
   }
 );
-const Note = new Schema({
+const NoteSchema = new Schema({
   note: String,
   subject: String,
   user: { type: Schema.ObjectId, ref: "User" },
 });
-const User = new Schema({
+const UserSchema = new Schema({
   name: String,
   email: {
     type: String,
@@ -46,18 +62,9 @@ const User = new Schema({
   notes: [{ type: Schema.Types.ObjectId, ref: "Note" }],
   comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
 });
-mongoose.model("Post", Post);
-mongoose.model("User", User);
-mongoose.model("Note", Note);
-mongoose.model("Comment", Comment);
+const Post = mongoose.model("Post", PostSchema);
+const User = mongoose.model("User", UserSchema);
+const Note = mongoose.model("Note", NoteSchema);
+const Comment = mongoose.model("Comment", CommentSchema);
 
-// import the configuration file for the mongodb database
-const fs = require("fs");
-const fn = "src/config.json";
-const data = fs.readFileSync(fn);
-
-const conf = JSON.parse(data);
-let dbconf = conf.dbconf;
-
-// connect to the database
-mongoose.connect(dbconf, { useNewUrlParser: true, useUnifiedTopology: true });
+export { Post, User, Note, Comment };
