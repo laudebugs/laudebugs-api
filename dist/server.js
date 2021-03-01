@@ -8,7 +8,6 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const path_1 = __importDefault(require("path"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const mongoose_1 = __importDefault(require("mongoose"));
 const express_graphql_1 = require("express-graphql");
 const schema_1 = require("./data/schema");
 const app = express_1.default();
@@ -23,10 +22,6 @@ require("./data/dbConnectors");
 app.use(express_1.default.static(publicPath));
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
-const Post = mongoose_1.default.model("Post");
-const User = mongoose_1.default.model("User");
-const Comment = mongoose_1.default.model("Comment");
-const Note = mongoose_1.default.model("Note");
 /**
  * Configure cors headers
  * Reference: https://stackoverflow.com/questions/51017702/enable-cors-in-fetch-api

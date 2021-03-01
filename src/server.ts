@@ -1,16 +1,9 @@
 import express from "express";
 // create the express app
 import cors from "cors";
-
 import path from "path";
 import bodyParser from "body-parser";
-import mongoose from "mongoose";
-import feed from "feed";
-import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 import { graphqlHTTP } from "express-graphql";
-import cheerio from "cheerio";
-import got from "got";
-
 import { schema } from "./data/schema";
 
 const app = express();
@@ -29,11 +22,6 @@ app.use(express.static(publicPath));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const Post = mongoose.model("Post");
-const User = mongoose.model("User");
-const Comment = mongoose.model("Comment");
-const Note = mongoose.model("Note");
-
 /**
  * Configure cors headers
  * Reference: https://stackoverflow.com/questions/51017702/enable-cors-in-fetch-api
@@ -46,10 +34,6 @@ app.use((req: any, res: any, next: any) => {
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
-  //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
-  res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", true);
   return next();
 });
 
