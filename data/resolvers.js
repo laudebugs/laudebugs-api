@@ -1,8 +1,8 @@
 import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 
-import { Post, User, Note, Comment } from "./dbConnectors";
-import { getAllPosts } from "../lib/contentful";
-import { getRandomImage, readableDate } from "../lib/functions";
+import { Post, User, Note, Comment } from "./dbConnectors.js";
+import { getAllPosts } from "../lib/contentful.js";
+import { getRandomImage, readableDate } from "../lib/functions.js";
 // Resolver map
 export const resolvers = {
   Query: {

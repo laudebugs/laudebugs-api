@@ -12,7 +12,7 @@ import { graphqlHTTP } from "express-graphql";
 import cheerio from "cheerio";
 import got from "got";
 
-import { schema } from "./data/schema";
+import { schema } from "./data/schema.js";
 
 const app = express();
 

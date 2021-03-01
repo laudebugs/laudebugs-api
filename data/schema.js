@@ -1,4 +1,4 @@
-import { resolvers } from "./resolvers";
+import { resolvers } from "./resolvers.js";
 import { makeExecutableSchema } from "graphql-tools";
 
 // Define types

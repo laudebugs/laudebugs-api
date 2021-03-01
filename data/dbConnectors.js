@@ -1,13 +1,9 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
-const emailValidator = require("email-validator");
+import emailValidator from "email-validator";
 // import the configuration file for the mongodb database
-const fs = require("fs");
-const fn = "src/config.json";
-const data = fs.readFileSync(fn);
-
-const conf = JSON.parse(data);
-let dbconf = conf.dbconf;
+console.log(process.env.MONGO_DB);
+let dbconf = process.env.MONGO_DB;
 
 // connect to the database
 mongoose.connect(dbconf, {
