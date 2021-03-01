@@ -1,8 +1,9 @@
 import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 
-import { Post, User, Note, Comment } from "./dbConnectors.js";
-import { getAllPosts } from "../lib/contentful.js";
-import { getRandomImage, readableDate } from "../lib/functions.js";
+import { Post, User, Note, Comment } from "./dbConnectors";
+import { getAllPosts } from "../lib/contentful";
+import { getRandomImage, readableDate } from "../lib/functions";
+import { PostType } from "./types";
 // Resolver map
 export const resolvers = {
   Query: {
@@ -14,29 +15,31 @@ export const resolvers = {
     getBlogPosts: async () => {
       let posts = await getAllPosts();
       posts.sort(function (a, b) {
-        return new Date(b.fields.date) - new Date(a.fields.date);
+        //@ts-ignore
+        return b.fields.date - a.fields.date;
       });
-      let data = posts.map((post) => {
+      let data = posts.map(<T>(post) => {
         let bodyType = typeof post.fields.body;
         post.fields.body =
           bodyType !== "string"
             ? documentToHtmlString(post.fields.body)
             : post.fields.body;
-        return {
-          slug: post.fields.slug,
-          title: post.fields.title,
-          description: post.fields.description,
-          body: post.fields.body,
-          date: readableDate(post.fields.date),
-          featuredImage: post.fields.feature_image.fields.file.url,
-          tags: post.fields.tags || [],
-          section: post.fields.section || [],
-          likeLevel: 0,
-          type: post.sys.contentType.sys.id,
-        };
+        return new PostType(
+          readableDate(post.fields.date),
+          post.fields.slug,
+          post.fields.title,
+          post.fields.description,
+          post.fields.body,
+          post.fields.feature_image.fields.file.url,
+          post.fields.tags || [],
+          post.fields.section || [],
+          0,
+          post.sys.contentType.sys.id
+        );
       });
       return data;
     },
+    //@ts-ignore
     getUser: () => {},
     /**
      * Gets comments based on a slug
@@ -46,18 +49,26 @@ export const resolvers = {
         let post = await Post.findOne({ slug: slug });
         if (post !== null) {
           const getComments = await Promise.all(
+            //@ts-ignore
             post.comments.map(async (commentId) => {
               return await Comment.findById(commentId);
             })
           );
           const commentsWitData = await Promise.all(
             getComments.map(async (comment) => {
-              let thisUser = await User.findById(comment.user);
+              //@ts-ignore
+              let thisUser: any = await User.findById(comment.user);
               let commentUser = thisUser.name;
 
               return {
+                //@ts-ignore
+
                 content: comment.content,
+                //@ts-ignore
+
                 approved: comment.approved,
+                //@ts-ignore
+
                 createdAt: readableDate(comment.createdAt),
                 user: { name: commentUser },
               };
@@ -75,6 +86,8 @@ export const resolvers = {
             likes: 0,
           });
           post.save();
+          //@ts-ignore
+
           return post.comments;
         }
       } catch (error) {
@@ -98,6 +111,7 @@ export const resolvers = {
         let post = await Post.findOne({ slug: slug });
 
         if (post !== null) {
+          //@ts-ignore
           return post.likes;
         } else {
           post = new Post({
@@ -105,6 +119,7 @@ export const resolvers = {
             likes: 0,
           });
           post.save();
+          //@ts-ignore
           return post.likes;
         }
       } catch (error) {
@@ -170,7 +185,9 @@ export const resolvers = {
           approved: false,
           moderated: false,
         });
+        //@ts-ignore
         post.comments.push(newComment._id);
+        //@ts-ignore
         currentUser.comments.push(newComment._id);
         currentUser.save();
         post.save();
@@ -196,7 +213,7 @@ export const resolvers = {
           note: note.note,
           user: usr._id,
         });
-
+        //@ts-ignore
         usr.notes.push(newNote._id);
 
         usr.save().then(() => {
@@ -213,8 +230,9 @@ export const resolvers = {
         if (!usr) {
           usr = new User({ name: user.name, email: user.email });
         }
-
+        //@ts-ignore
         usr.sneekpeeks = user.sneekpeeks;
+        //@ts-ignore
         usr.newposts = user.newposts;
 
         usr.save();
@@ -233,8 +251,10 @@ export const resolvers = {
             likes: 0,
           });
         }
+        //@ts-ignore
         post.likes += 1;
         post.save();
+        //@ts-ignore
         return post.likes;
       } catch (error) {
         return -1;

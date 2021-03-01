@@ -14,6 +14,6 @@ export async function getRandomImage() {
   return images[randomNo].attribs.src;
 }
 
-export function readableDate(dateString) {
+export function readableDate(dateString: number): String {
   return new Date(dateString).toDateString();
 }

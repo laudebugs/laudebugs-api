@@ -3,9 +3,11 @@ const Schema = mongoose.Schema;
 import emailValidator from "email-validator";
 // import the configuration file for the mongodb database
 console.log(process.env.MONGO_DB);
-let dbconf = process.env.MONGO_DB;
+//@ts-ignore
+let dbconf: String = process.env.MONGO_DB;
 
 // connect to the database
+//@ts-ignore
 mongoose.connect(dbconf, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -26,9 +28,12 @@ const PostSchema = new Schema({
 const CommentSchema = new Schema(
   {
     content: String,
+    //@ts-ignore
     user: { type: Schema.ObjectId, ref: "User" },
     likes: Number,
+    //@ts-ignore
     approved: false,
+    //@ts-ignore
     moderated: false,
   },
   {
@@ -37,7 +42,7 @@ const CommentSchema = new Schema(
 );
 const NoteSchema = new Schema({
   note: String,
-  subject: String,
+  //@ts-ignore
   user: { type: Schema.ObjectId, ref: "User" },
 });
 const UserSchema = new Schema({
@@ -53,7 +58,9 @@ const UserSchema = new Schema({
     },
     index: { unique: true },
   },
+  //@ts-ignore
   sneekpeeks: false,
+  //@ts-ignore
   newposts: false,
   notes: [{ type: Schema.Types.ObjectId, ref: "Note" }],
   comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],

@@ -15,7 +15,7 @@ const getProjects = () =>
     .getEntries({ content_type: "project" })
     .then((response) => response.items);
 
-const getSinglePost = (slug) =>
+const getSinglePost = (slug: String) =>
   client
     .getEntries({
       "fields.slug": slug,
@@ -23,7 +23,7 @@ const getSinglePost = (slug) =>
     })
     .then((response) => response.items);
 
-const getSingleExperiment = (slug) =>
+const getSingleExperiment = (slug: String) =>
   client
     .getEntries({
       "fields.slug": slug,
@@ -31,7 +31,7 @@ const getSingleExperiment = (slug) =>
     })
     .then((response) => response.items);
 
-const getTaggedPost = (tag) =>
+const getTaggedPost = (tag: String) =>
   client
     .getEntries({
       "fields.tags": tag,
@@ -39,14 +39,14 @@ const getTaggedPost = (tag) =>
     })
     .then((response) => response.items);
 
-const getTaggedPosts = (tag) =>
+const getTaggedPosts = (tag: String) =>
   client
     .getEntries({
       "fields.tags": tag,
       content_type: "post",
     })
     .then((response) => response.items);
-const getSectionedPosts = (section) =>
+const getSectionedPosts = (section: String) =>
   client
     .getEntries({
       "fields.section": section,
