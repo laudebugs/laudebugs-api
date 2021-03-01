@@ -64,7 +64,8 @@ const typeDefs = `
     input NoteInput {
         note: String
         subject: String
-        user: UserInput
+        email: String
+        name: String
     }
     input CommentInput {
         comment: String
