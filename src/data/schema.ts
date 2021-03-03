@@ -78,7 +78,10 @@ const typeDefs = `
         likes: Int
         comments: [CommentInput]
     }
-
+    type Snack {
+        body:String
+        fileName:String
+    }
     type Query {
         getUser: User
         getComments (slug: String!): [Comment]
@@ -89,6 +92,7 @@ const typeDefs = `
         getBlogPosts: [BlogPost]
         getRandomImage: RandomImage
         getUnapprovedComments: [Comment]
+        getSnacks:[Snack]
     }
 
     type Mutation {

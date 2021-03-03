@@ -22,6 +22,17 @@ exports.resolvers = {
         getPosts: () => {
             return dbConnectors_1.Post.find();
         },
+        getSnacks: () => __awaiter(void 0, void 0, void 0, function* () {
+            return functions_1.getSnacks().then((data) => {
+                let snacks = data.data.data.repository.defaultBranchRef.target.file.object.entries;
+                snacks = snacks.filter((snack) => snack.name.substring(snack.name.length - 3) === ".md" &&
+                    snack.name !== "README.md");
+                snacks = snacks.map((snack) => {
+                    return { fileName: snack.name, body: snack.object.text };
+                });
+                return snacks;
+            });
+        }),
         getPost: () => { },
         getBlogPosts: () => __awaiter(void 0, void 0, void 0, function* () {
             let posts = yield contentful_1.getAllPosts();

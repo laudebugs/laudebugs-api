@@ -2,7 +2,7 @@ import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 
 import { Post, User, Note, Comment } from "./dbConnectors";
 import { getAllPosts } from "../lib/contentful";
-import { getRandomImage, readableDate } from "../lib/functions";
+import { getRandomImage, readableDate, getSnacks } from "../lib/functions";
 import { PostType } from "./types";
 // Resolver map
 export const resolvers = {
@@ -11,6 +11,21 @@ export const resolvers = {
     getPosts: () => {
       return Post.find();
     },
+    getSnacks: async () => {
+      return getSnacks().then((data) => {
+        let snacks =
+          data.data.data.repository.defaultBranchRef.target.file.object.entries;
+        snacks = snacks.filter(
+          (snack) =>
+            snack.name.substring(snack.name.length - 3) === ".md" &&
+            snack.name !== "README.md"
+        );
+        snacks = snacks.map((snack) => {
+          return { fileName: snack.name, body: snack.object.text };
+        });
+        return snacks;
+      });
+    },
     getPost: () => {},
     getBlogPosts: async () => {
       let posts = await getAllPosts();
@@ -18,6 +33,7 @@ export const resolvers = {
         //@ts-ignore
         return b.fields.date - a.fields.date;
       });
+
       let data = posts.map(<T>(post) => {
         let bodyType = typeof post.fields.body;
         post.fields.body =
@@ -37,6 +53,7 @@ export const resolvers = {
           post.sys.contentType.sys.id
         );
       });
+
       return data;
     },
     //@ts-ignore

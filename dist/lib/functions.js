@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readableDate = exports.getRandomImage = void 0;
+exports.getSnacks = exports.readableDate = exports.getRandomImage = void 0;
 const cheerio_1 = __importDefault(require("cheerio"));
 const got_1 = __importDefault(require("got"));
+const axios_1 = __importDefault(require("axios"));
 function getRandomImage() {
     return __awaiter(this, void 0, void 0, function* () {
         const url = "https://www.eyeem.com/u/laudebugs";
@@ -32,4 +33,37 @@ function readableDate(dateString) {
     return new Date(dateString).toDateString();
 }
 exports.readableDate = readableDate;
+const githubUrl = "https://api.github.com/graphql";
+const oauth = { Authorization: "bearer " + process.env.GH_TOKEN };
+const query = `
+           {
+             repository(owner: "lbugasu", name: "articles") {
+               defaultBranchRef {
+                 target {
+                   ... on Commit {
+                     file(path: "/") {
+                       type
+                       object {
+                         ... on Tree {
+                           entries {
+                             name
+                             object {
+                               ... on Blob {
+                                 text
+                               }
+                             }
+                           }
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         `;
+const getSnacks = () => {
+    return axios_1.default.post(githubUrl, { query: query }, { headers: oauth });
+};
+exports.getSnacks = getSnacks;
 //# sourceMappingURL=functions.js.map
