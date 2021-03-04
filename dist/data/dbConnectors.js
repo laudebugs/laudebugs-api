@@ -8,7 +8,6 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const Schema = mongoose_1.default.Schema;
 const email_validator_1 = __importDefault(require("email-validator"));
 // import the configuration file for the mongodb database
-console.log(process.env.MONGO_DB);
 //@ts-ignore
 let dbconf = process.env.MONGO_DB;
 // connect to the database

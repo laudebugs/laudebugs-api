@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 import emailValidator from "email-validator";
 // import the configuration file for the mongodb database
-console.log(process.env.MONGO_DB);
 //@ts-ignore
 let dbconf: String = process.env.MONGO_DB;
 
