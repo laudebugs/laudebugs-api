@@ -1,8 +1,9 @@
-import { resolvers } from "./resolvers.js";
-import { makeExecutableSchema } from "graphql-tools";
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.schema = void 0;
+const resolvers_js_1 = require("./resolvers.js");
+const graphql_tools_1 = require("graphql-tools");
 // Define types
-
 const typeDefs = `
     type User {
         id: ID
@@ -78,7 +79,10 @@ const typeDefs = `
         likes: Int
         comments: [CommentInput]
     }
-
+    type Snack {
+        body:String
+        fileName:String
+    }
     type Query {
         getUser: User
         getComments (slug: String!): [Comment]
@@ -89,6 +93,7 @@ const typeDefs = `
         getBlogPosts: [BlogPost]
         getRandomImage: RandomImage
         getUnapprovedComments: [Comment]
+        getSnacks:[Snack]
     }
 
     type Mutation {
@@ -100,7 +105,6 @@ const typeDefs = `
         userSignUp (user: UserInput): User
     }
 `;
-
-const schema = makeExecutableSchema({ typeDefs, resolvers });
-
-export { schema };
+const schema = graphql_tools_1.makeExecutableSchema({ typeDefs, resolvers: resolvers_js_1.resolvers });
+exports.schema = schema;
+//# sourceMappingURL=schema.js.map
