@@ -29,9 +29,11 @@ export const resolvers = {
     getPost: () => {},
     getBlogPosts: async () => {
       let posts = await getAllPosts();
-      posts.sort(function (a, b) {
+      //@ts-ignore
+      console.log(posts[0].fields.date);
+      posts = posts.sort((a, b) => {
         //@ts-ignore
-        return b.fields.date - a.fields.date;
+        return new Date(b.fields.date) - new Date(a.fields.date);
       });
 
       let data = posts.map(<T>(post) => {

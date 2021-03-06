@@ -36,9 +36,11 @@ exports.resolvers = {
         getPost: () => { },
         getBlogPosts: () => __awaiter(void 0, void 0, void 0, function* () {
             let posts = yield contentful_1.getAllPosts();
-            posts.sort(function (a, b) {
+            //@ts-ignore
+            console.log(posts[0].fields.date);
+            posts = posts.sort((a, b) => {
                 //@ts-ignore
-                return b.fields.date - a.fields.date;
+                return new Date(b.fields.date) - new Date(a.fields.date);
             });
             let data = posts.map((post) => {
                 let bodyType = typeof post.fields.body;

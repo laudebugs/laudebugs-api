@@ -41,13 +41,12 @@ app.use(
   "/graphql",
   graphqlHTTP({
     schema: schema,
-    rootValue: root,
     graphiql: true,
   })
 );
 
 app.get("*", (req: any, res: any) => {
-  res.send("welcome to lau de bugs's api");
+  res.json({ messsage: "welcome to lau de bugs's api" });
 });
 /**
  * Posts a request to delete any identifying information for a user - email, name, comments

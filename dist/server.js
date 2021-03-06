@@ -37,11 +37,10 @@ app.use((req, res, next) => {
 });
 app.use("/graphql", express_graphql_1.graphqlHTTP({
     schema: schema_1.schema,
-    rootValue: root,
     graphiql: true,
 }));
 app.get("*", (req, res) => {
-    res.send("welcome to lau de bugs's api");
+    res.json({ messsage: "welcome to lau de bugs's api" });
 });
 /**
  * Posts a request to delete any identifying information for a user - email, name, comments
