@@ -1,7 +1,8 @@
 import cheerio from "cheerio";
 import got from "got";
 import axios from "axios";
-
+// import mailchimp from "@mailchimp/mailchimp_marketing";
+const mailchimp = require("@mailchimp/mailchimp_marketing");
 export async function getRandomImage() {
   const url = "https://www.eyeem.com/u/laudebugs";
   let page = await got(url);
@@ -52,3 +53,21 @@ const query = `
 export const getSnacks = () => {
   return axios.post(githubUrl, { query: query }, { headers: oauth });
 };
+
+/* Mailchimp integration */
+mailchimp.setConfig({
+  apiKey: "a8cba921f0e83c43fbcde91a17357c2f-us4",
+  server: "us4",
+});
+
+export async function addSubscriber(user) {
+  const response = await mailchimp.lists.addListMember("8a0a984d69", {
+    email_address: user.email,
+    status: "subscribed",
+    merge_fields: {
+      FNAME: user.firstName,
+      LNAME: user.lastName,
+    },
+  });
+  console.log(response.id);
+}

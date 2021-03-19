@@ -1,5 +1,5 @@
-import { resolvers } from "./resolvers.js";
 import { makeExecutableSchema } from "graphql-tools";
+import { resolvers } from "./resolvers.js";
 
 // Define types
 
@@ -93,6 +93,7 @@ const typeDefs = `
         getRandomImage: RandomImage
         getUnapprovedComments: [Comment]
         getSnacks:[Snack]
+        getSpotifyAlbums (query: String!): String
     }
 
     type Mutation {

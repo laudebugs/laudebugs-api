@@ -1,9 +1,9 @@
-import express from "express";
+import bodyParser from "body-parser";
 // create the express app
 import cors from "cors";
-import path from "path";
-import bodyParser from "body-parser";
+import express from "express";
 import { graphqlHTTP } from "express-graphql";
+import path from "path";
 import { schema } from "./data/schema";
 
 const app = express();
@@ -45,9 +45,6 @@ app.use(
   })
 );
 
-app.get("*", (req: any, res: any) => {
-  res.json({ messsage: "welcome to lau de bugs's api" });
-});
 /**
  * Posts a request to delete any identifying information for a user - email, name, comments
  */

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "mailchimp-api": "registry:npm/mailchimp-api#2.0.0+20160315224504"
+  }
+}
