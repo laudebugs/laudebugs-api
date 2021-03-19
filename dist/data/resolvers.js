@@ -8,12 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
 const rich_text_html_renderer_1 = require("@contentful/rich-text-html-renderer");
-const dbConnectors_1 = require("./dbConnectors");
+const spotify_1 = __importDefault(require("../clients/spotify"));
 const contentful_1 = require("../lib/contentful");
 const functions_1 = require("../lib/functions");
+const dbConnectors_1 = require("./dbConnectors");
 const types_1 = require("./types");
 // Resolver map
 exports.resolvers = {
@@ -37,11 +41,6 @@ exports.resolvers = {
         getBlogPosts: () => __awaiter(void 0, void 0, void 0, function* () {
             let posts = yield contentful_1.getAllPosts();
             //@ts-ignore
-            console.log(posts[0].fields.date);
-            posts = posts.sort((a, b) => {
-                //@ts-ignore
-                return new Date(b.fields.date) - new Date(a.fields.date);
-            });
             let data = posts.map((post) => {
                 let bodyType = typeof post.fields.body;
                 post.fields.body =
@@ -51,6 +50,18 @@ exports.resolvers = {
                 return new types_1.PostType(functions_1.readableDate(post.fields.date), post.fields.slug, post.fields.title, post.fields.description, post.fields.body, post.fields.feature_image.fields.file.url, post.fields.tags || [], post.fields.section || [], 0, post.sys.contentType.sys.id);
             });
             return data;
+        }),
+        getSpotifyAlbums: (root, { query }) => __awaiter(void 0, void 0, void 0, function* () {
+            return spotify_1.default
+                .request(`https://api.spotify.com/v1/${query}`)
+                .then(function (data) {
+                let sth = JSON.stringify(data);
+                return sth;
+            })
+                .catch((err) => {
+                console.log(err.message);
+                return err.message;
+            });
         }),
         //@ts-ignore
         getUser: () => { },
@@ -245,7 +256,14 @@ exports.resolvers = {
                 //@ts-ignore
                 usr.newposts = user.newposts;
                 usr.save();
-                return usr;
+                let subRequest = functions_1.addSubscriber({
+                    email: user.email,
+                    firstName: user.name,
+                    lastName: user.name,
+                });
+                subRequest.then(() => {
+                    return usr;
+                });
             }
             catch (error) {
                 return null;

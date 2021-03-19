@@ -3,12 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
+const body_parser_1 = __importDefault(require("body-parser"));
 // create the express app
 const cors_1 = __importDefault(require("cors"));
-const path_1 = __importDefault(require("path"));
-const body_parser_1 = __importDefault(require("body-parser"));
+const express_1 = __importDefault(require("express"));
 const express_graphql_1 = require("express-graphql");
+const path_1 = __importDefault(require("path"));
 const schema_1 = require("./data/schema");
 const app = express_1.default();
 const publicPath = path_1.default.resolve(__dirname, "public");
@@ -39,9 +39,6 @@ app.use("/graphql", express_graphql_1.graphqlHTTP({
     schema: schema_1.schema,
     graphiql: true,
 }));
-app.get("*", (req, res) => {
-    res.json({ messsage: "welcome to lau de bugs's api" });
-});
 /**
  * Posts a request to delete any identifying information for a user - email, name, comments
  */

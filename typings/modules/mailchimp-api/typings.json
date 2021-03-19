@@ -1,0 +1,9 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/typed-contrib/mailchimp-api/4f95e1ce4582710911977675a2d235315bd612e0/typings.json",
+    "raw": "registry:npm/mailchimp-api#2.0.0+20160315224504",
+    "main": "mailchimp-api.d.ts",
+    "name": "mailchimp-api"
+  }
+}

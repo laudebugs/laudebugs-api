@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.schema = void 0;
-const resolvers_js_1 = require("./resolvers.js");
 const graphql_tools_1 = require("graphql-tools");
+const resolvers_js_1 = require("./resolvers.js");
 // Define types
 const typeDefs = `
     type User {
@@ -94,6 +94,7 @@ const typeDefs = `
         getRandomImage: RandomImage
         getUnapprovedComments: [Comment]
         getSnacks:[Snack]
+        getSpotifyAlbums (query: String!): String
     }
 
     type Mutation {

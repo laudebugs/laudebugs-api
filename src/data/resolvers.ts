@@ -1,9 +1,15 @@
 import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
-
-import { Post, User, Note, Comment } from "./dbConnectors";
+import spotifyClient from "../clients/spotify";
 import { getAllPosts } from "../lib/contentful";
-import { getRandomImage, readableDate, getSnacks } from "../lib/functions";
+import {
+  addSubscriber,
+  getRandomImage,
+  getSnacks,
+  readableDate,
+} from "../lib/functions";
+import { Comment, Note, Post, User } from "./dbConnectors";
 import { PostType } from "./types";
+
 // Resolver map
 export const resolvers = {
   Query: {
@@ -30,11 +36,6 @@ export const resolvers = {
     getBlogPosts: async () => {
       let posts = await getAllPosts();
       //@ts-ignore
-      console.log(posts[0].fields.date);
-      posts = posts.sort((a, b) => {
-        //@ts-ignore
-        return new Date(b.fields.date) - new Date(a.fields.date);
-      });
 
       let data = posts.map(<T>(post) => {
         let bodyType = typeof post.fields.body;
@@ -57,6 +58,18 @@ export const resolvers = {
       });
 
       return data;
+    },
+    getSpotifyAlbums: async (root, { query }) => {
+      return spotifyClient
+        .request(`https://api.spotify.com/v1/${query}`)
+        .then(function (data) {
+          let sth = JSON.stringify(data);
+          return sth;
+        })
+        .catch((err) => {
+          console.log(err.message);
+          return err.message;
+        });
     },
     //@ts-ignore
     getUser: () => {},
@@ -255,7 +268,15 @@ export const resolvers = {
         usr.newposts = user.newposts;
 
         usr.save();
-        return usr;
+
+        let subRequest = addSubscriber({
+          email: user.email,
+          firstName: user.name,
+          lastName: user.name,
+        });
+        subRequest.then(() => {
+          return usr;
+        });
       } catch (error) {
         return null;
       }
