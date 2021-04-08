@@ -50,5 +50,5 @@ app.use(
  * Posts a request to delete any identifying information for a user - email, name, comments
  */
 app.post("/deleterequest", (req: any, res: any) => {});
-const port = 8080;
+const port = process.env.PORT || 9000;
 app.listen(port, () => console.log(`Server is running on port ${port}`));
