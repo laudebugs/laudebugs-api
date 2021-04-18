@@ -1,7 +1,14 @@
-import { Mutation, Query, Resolver } from "type-graphql";
+import { InputType, Mutation, Query, Resolver } from "type-graphql";
 import { addSubscriber } from "../../lib/functions";
 import User, { UserModel } from "../../Models/User";
 
+@InputType()
+class UserInput{
+  name!: string
+  email!: string
+  sneekpeeks!: boolean
+  newposts!:boolean
+}
 @Resolver((of) => User)
 export default class UserResolver {
   @Query((returns) => [User])
@@ -11,9 +18,9 @@ export default class UserResolver {
     return users;
   }
 
-  @Mutation()
+  @Mutation((returns)=>User)
 
-      async userSignUp(root, { user }){
+      async userSignUp( user: UserInput){
       try {
         let usr = await UserModel.findOne({ email: user.email });
         if (!usr) {

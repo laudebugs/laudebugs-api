@@ -12,7 +12,7 @@ export default class PostResolver {
   @Query((returns) => Number)
   async getLikes(root, { slug }): Promise<number> {
     try {
-      let post: Post | any  = await PostModel.findOne({ slug: slug });
+      let post: Post | any = await PostModel.findOne({ slug: slug });
 
       if (post !== null) {
         return post.likes;
@@ -33,7 +33,7 @@ export default class PostResolver {
     }
   }
 
-  @Mutation()
+  @Mutation((returns) => Number)
   async postLike(root, { slug }): Promise<number> {
     console.log(slug);
     try {

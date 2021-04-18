@@ -18,14 +18,29 @@ type BlogPost {
 }
 
 type Comment {
+  approved: Boolean!
   content: String!
+  createdAt: DateTime!
   likes: Float!
   moderated: Boolean!
   user: User!
+  user_name: String!
+}
+
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+type Mutation {
+  createComment: Comment!
+  postLike: Float!
+  userSignUp: User!
 }
 
 type Note {
   note: String!
+  subject: String!
   user: User!
 }
 

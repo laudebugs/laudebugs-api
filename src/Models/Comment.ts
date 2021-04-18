@@ -13,8 +13,6 @@ export default class Comment {
   @prop({ ref: "User" })
   user?: Ref<User>;
 
-
-    
   @Field()
   @prop({ default: 0 })
   likes!: number;
@@ -27,9 +25,9 @@ export default class Comment {
   @prop({ default: false })
   approved!: boolean;
 
-  @Field()
+  @Field((type) => Date)
   @prop()
-  createdAt!: Date | string;
+  createdAt!: Date ;
 
   @Field()
   user_name?: string;

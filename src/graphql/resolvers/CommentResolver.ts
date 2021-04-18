@@ -1,10 +1,10 @@
 import User, { UserModel } from './../../Models/User';
-import { Mutation, Query, Resolver } from "type-graphql";
+import { InputType, Mutation, Query, Resolver } from "type-graphql";
 import Comment, { CommentModel } from "../../Models/Comment";
 import { PostModel } from "../../Models/Post";
 import { readableDate } from '../../lib/functions';
 
-
+!InputType();
 class CommentInput {
         public comment!: string;
   public email!:string
