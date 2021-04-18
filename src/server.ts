@@ -1,3 +1,4 @@
+require('dotenv').config()
 import bodyParser from "body-parser";
 // create the express app
 import cors from "cors";
@@ -49,5 +50,6 @@ app.use(
  * Posts a request to delete any identifying information for a user - email, name, comments
  */
 app.post("/deleterequest", (req: any, res: any) => {});
+
 const port = 8080;
 app.listen(port, () => console.log(`Server is running on port ${port}`));

@@ -3,14 +3,21 @@
   "name": "laudebugs-api",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "./dist/server.js",
+  "scripts": {
+    "start": "node ./dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run:dev": "npx concurrently \"tsc -w\" \"nodemon ./dist/server.js\""
+  },
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "@contentful/rich-text-html-renderer": "^14.1.2",
     "@mailchimp/mailchimp_marketing": "^3.0.34",
+    "@types/node": "^14.14.41",
     "cheerio": "^1.0.0-rc.5",
     "contentful": "^8.1.7",
     "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "express-graphql": "^0.12.0",
@@ -24,19 +31,14 @@
     "node-spotify-api": "^1.1.1",
     "request": "^2.88.2"
   },
-  "scripts": {
-    "start": "node ./dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "run:dev": "npx concurrently \"tsc -w\" \"nodemon ./dist/server.js\""
-  },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-0": "^6.24.1",
     "concurrently": "^6.0.0",
+    "dotenv": "^8.2.0",
     "nodemon": "^2.0.7",
+    "typescript": "^4.2.4",
     "typesync": "^0.8.0"
   }
 }
