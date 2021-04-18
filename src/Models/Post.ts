@@ -12,8 +12,8 @@ export default class Post {
   public slug?: string;
 
   @Field((type) => [Comment])
-  @prop({ ref: "Comment" })
-  comments?: Ref<Comment>[];
+  @prop({ ref: "Comment", default: [] })
+  comments!: Ref<Comment>[];
 }
 
 export const PostModel = getModelForClass(Post);

@@ -17,7 +17,6 @@ import { buildSchema } from "type-graphql";
 const dbconf: string = process.env.MONGO_DB || "";
 
 // connect to the database
-//@ts-ignore
 mongoose.connect(dbconf, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

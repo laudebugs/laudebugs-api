@@ -12,10 +12,9 @@ export default class PostResolver {
   @Query((returns) => Number)
   async getLikes(root, { slug }): Promise<number> {
     try {
-      let post = await PostModel.findOne({ slug: slug });
+      let post: Post | any  = await PostModel.findOne({ slug: slug });
 
       if (post !== null) {
-        //@ts-ignore
         return post.likes;
       } else {
         post = new PostModel({
@@ -23,7 +22,6 @@ export default class PostResolver {
           likes: 0,
         });
         post.save();
-        //@ts-ignore
         return post.likes;
       }
     } catch (error) {
@@ -31,6 +29,25 @@ export default class PostResolver {
        * Means there was an error in retrieving the post likes or
        * in saving the post likes
        */
+      return -1;
+    }
+  }
+
+  @Mutation()
+  async postLike(root, { slug }): Promise<number> {
+    console.log(slug);
+    try {
+      let post: Post | any = await PostModel.findOne({ slug: slug });
+      if (post === null) {
+        post = new PostModel({
+          slug: slug,
+          likes: 0,
+        });
+      }
+      post.likes += 1;
+      post.save();
+      return post.likes;
+    } catch (error) {
       return -1;
     }
   }

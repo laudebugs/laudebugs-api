@@ -24,11 +24,11 @@ export default class User{
     public newposts?:boolean
 
     @Field((type)=>[Note])
-    @prop({ref:"Note"})
+    @prop({ref:"Note", default: []})
     public notes?:Ref<Note>[]
 
     @Field((type)=>[Comment])
-    @prop({ref: "Comment"})
+    @prop({ref: "Comment", default: []})
     comments?:Ref<Comment>[]
 
 }

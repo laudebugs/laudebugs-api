@@ -4,24 +4,35 @@ import User from "./User";
 
 
 @ObjectType()
-export default class Comment{
-    @Field()
-    @prop()
-    public content?: string;
+export default class Comment {
+  @Field()
+  @prop({ default: "" })
+  public content!: string;
 
-    @Field((type)=>User)
-    @prop({ref: "User"})
-    user?: Ref<User> 
+  @Field((type) => User)
+  @prop({ ref: "User" })
+  user?: Ref<User>;
 
-    @Field()
-    @prop()
-    likes?: number
-
-    @Field()
-    @prop()
-    moderated?: boolean 
 
     
+  @Field()
+  @prop({ default: 0 })
+  likes!: number;
+
+  @Field()
+  @prop({ default: false })
+  moderated!: boolean;
+
+  @Field()
+  @prop({ default: false })
+  approved!: boolean;
+
+  @Field()
+  @prop()
+  createdAt!: Date | string;
+
+  @Field()
+  user_name?: string;
 }
 
 export const CommentModel = getModelForClass(Comment)
