@@ -51,7 +51,21 @@ const query = `
            }
          `;
 export const getSnacks = () => {
-  return axios.post(githubUrl, { query: query }, { headers: oauth });
+  return axios
+    .post(githubUrl, { query: query }, { headers: oauth })
+    .then((data) => {
+      let snacks =
+        data.data.data.repository.defaultBranchRef.target.file.object.entries;
+      snacks = snacks.filter(
+        (snack) =>
+          snack.name.substring(snack.name.length - 3) === ".md" &&
+          snack.name !== "README.md"
+      );
+      snacks = snacks.map((snack) => {
+        return { fileName: snack.name, body: snack.object.text };
+      });
+      return snacks;
+    });
 };
 
 /* Mailchimp integration */

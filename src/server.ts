@@ -1,55 +1,69 @@
-require('dotenv').config()
-import bodyParser from "body-parser";
-// create the express app
-import cors from "cors";
-import express from "express";
-import { graphqlHTTP } from "express-graphql";
-import path from "path";
-import { schema } from "./data/schema";
+import mongoose from "mongoose";
+require("dotenv").config();
 
-const app = express();
+import "reflect-metadata";
+import Fastify from "fastify";
+import mercurius from "mercurius";
+const AltairFastify = require("altair-fastify-plugin");
 
-const publicPath = path.resolve(__dirname, "public");
+import BlogPostResolver from "./graphql/resolvers/BlogPostResolver";
+import PostResolver from "./graphql/resolvers/PostResolver";
+import CommentResolver from "./graphql/resolvers/CommentResolver";
+import SnackResolver from "./graphql/resolvers/SnackResolver";
+import SpotifyResolver from "./graphql/resolvers/SpotifyResolver";
+import UserResolver from "./graphql/resolvers/UserResolver";
+import { buildSchema } from "type-graphql";
 
-app.use(cors());
-/**
- * Cheerio and got are used to parse EyeEm photos by webscraping my user profile
- */
+const dbconf: string = process.env.MONGO_DB || "";
 
-const { Db } = require("mongodb");
-require("./data/dbConnectors");
-// Add middleware
-app.use(express.static(publicPath));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-/**
- * Configure cors headers
- * Reference: https://stackoverflow.com/questions/51017702/enable-cors-in-fetch-api
- */
-const root = { hello: () => "GraphQL is amazing" };
-
-app.use((req: any, res: any, next: any) => {
-  const allowedOrigins = ["http://laudebugs.me", "http://localhost:3000"];
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-  return next();
+// connect to the database
+//@ts-ignore
+mongoose.connect(dbconf, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true,
 });
 
-app.use(
-  "/graphql",
-  graphqlHTTP({
-    schema: schema,
-    graphiql: true,
-  })
-);
+(async function runServer() {
+  const schema = await buildSchema({
+    resolvers: [
+      BlogPostResolver,
+      PostResolver,
+      CommentResolver,
+      SnackResolver,
+      SpotifyResolver,
+      UserResolver,
+    ],
+  });
+  const app = Fastify();
 
-/**
- * Posts a request to delete any identifying information for a user - email, name, comments
- */
-app.post("/deleterequest", (req: any, res: any) => {});
+  app.register(mercurius, {
+    graphiql: false,
+    ide: false,
+    path: "/graphql",
+    schema,
+  });
+  app.register(require("fastify-cors"), {
+    origin: ["http://laudebugs.me", "http://localhost:4200"],
+  });
 
-const port = 8080;
-app.listen(port, () => console.log(`Server is running on port ${port}`));
+  /**
+   * Posts a request to delete any identifying information for a user - email, name, comments
+   */
+  app.post("/deleterequest", (req: any, res: any) => {});
+
+
+ 
+  // ...
+  app.register(AltairFastify, {
+    path: "/altair",
+    baseURL: "/altair/",
+    // 'endpointURL' should be the same as the mercurius 'path'
+    endpointURL: "/graphql",
+  });
+
+  const PORT = process.env.PORT || 8080;
+
+  app.listen(PORT);
+})();
