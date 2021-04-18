@@ -35,38 +35,29 @@ async function runServer() {
       SpotifyResolver,
       UserResolver,
     ],
+    emitSchemaFile: true,
   });
   const app = Fastify();
 
   app.register(mercurius, {
-    graphiql: "playground",
+    graphiql: false,
+    ide:  false,
     schema,
+    path: "/graphql",
   });
-  // app.register(require("fastify-cors"), {
-  //   origin: ["http://laudebugs.me", "http://localhost:4200"],
-  // });
 
-  /**
-   * Posts a request to delete any identifying information for a user - email, name, comments
-   */
-  // app.post("/deleterequest", (req: any, res: any) => {});
-
-
+  app.register(require("fastify-cors"), {
+    origin: ["http://laudebugs.me", "http://localhost:4200"],
+  });
  
-  // ...
-  // app.register(AltairFastify, {
-  //   path: "/altair",
-  //   baseURL: "/altair/",
-  //   // 'endpointURL' should be the same as the mercurius 'path'
-  //   endpointURL: "/graphql",
-  // });
+  app.register(AltairFastify, {
+    path: "/altair",
+    baseURL: "/altair/",
+    endpointURL: "/graphql",
+  });
 
   const PORT = process.env.PORT || 8080;
 
-    app.get("/", async (req, reply) => {
-      const query = "{ add(x: 2, y: 2) }";
-      return reply.graphql(query);
-    });
   app.listen(PORT, ()=>console.log(`api running on port ${PORT}`))
 }
 
