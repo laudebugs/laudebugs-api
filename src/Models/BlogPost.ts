@@ -8,7 +8,7 @@ export default class BlogPost {
   @Field()
   title?: string;
 
-  @Field()
+  @Field({ nullable: true })
   description?: string;
 
   @Field()
@@ -32,7 +32,7 @@ export default class BlogPost {
   @Field()
   likes?: number;
 
-  @Field()
+  @Field({  nullable:  true  })
   likeLevel?: number;
 
   @Field()

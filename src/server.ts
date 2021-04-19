@@ -4,6 +4,7 @@ require("dotenv").config();
 import "reflect-metadata";
 import Fastify from "fastify";
 import mercurius from "mercurius";
+const fastifyWebsocket = require("fastify-websocket");
 const AltairFastify = require("altair-fastify-plugin");
 
 import BlogPostResolver from "./graphql/resolvers/BlogPostResolver";
@@ -49,10 +50,23 @@ async function runServer() {
     origin: ["http://laudebugs.me", "http://localhost:4200"],
   });
  
+  app.register(fastifyWebsocket, {
+    options: {
+      maxPayload: 1048576,
+    },
+  });
+
   app.register(AltairFastify, {
     path: "/altair",
     baseURL: "/altair/",
     endpointURL: "/graphql",
+  });
+
+  app.get("/subs", { websocket: true }, (connection, req) => {
+    connection.socket.on("message", (message) => {
+      // connection.socket.send("hi from server");
+      console.log("connected");
+    });
   });
 
   const PORT = process.env.PORT || 8080;

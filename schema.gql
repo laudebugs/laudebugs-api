@@ -6,9 +6,9 @@
 type BlogPost {
   body: String!
   date: String!
-  description: String!
+  description: String
   featuredImage: String!
-  likeLevel: Float!
+  likeLevel: Float
   likes: Float!
   section: [String!]!
   slug: String!
