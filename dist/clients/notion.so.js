@@ -61,6 +61,6 @@ getPublishedpages().then((query) => __awaiter(void 0, void 0, void 0, function* 
         const pageBlocks = getPageBlocks(page.id);
         return pageBlocks;
     }));
-    getPages().then(results => console.log(results));
+    getPages().then(results => console.log(JSON.stringify(results)));
 }));
 //# sourceMappingURL=notion.so.js.map

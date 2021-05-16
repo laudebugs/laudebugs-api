@@ -53,5 +53,5 @@ getPublishedpages().then(async query => {
         return pageBlocks
       })
     )
-  getPages().then(results => console.log(results))
+  getPages().then(results => console.log(JSON.stringify(results)))
 })
