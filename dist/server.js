@@ -13,7 +13,7 @@ const path_1 = __importDefault(require("path"));
 const schema_1 = require("./data/schema");
 require('./clients/notion.so');
 const app = express_1.default();
-const publicPath = path_1.default.resolve(__dirname, 'public');
+const publicPath = path_1.default.resolve(__dirname, '../public');
 app.use(cors_1.default());
 /**
  * Cheerio and got are used to parse EyeEm photos by webscraping my user profile
@@ -41,6 +41,9 @@ app.use('/graphql', express_graphql_1.graphqlHTTP({
     schema: schema_1.schema,
     graphiql: true
 }));
+app.get('', (req, res) => {
+    res.sendFile(path_1.default.join(publicPath, 'index.html'));
+});
 /**
  * Posts a request to delete any identifying information for a user - email, name, comments
  */

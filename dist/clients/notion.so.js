@@ -17,7 +17,7 @@ exports.notion = new Client({
 });
 const doSth = () => __awaiter(void 0, void 0, void 0, function* () {
     const listUsersResponse = yield exports.notion.users.list();
-    console.log(listUsersResponse);
+    // console.log(listUsersResponse)
 });
 // doSth()
 // Add any filters here
@@ -32,7 +32,7 @@ const getBlog = () => __awaiter(void 0, void 0, void 0, function* () {
             database_id: process.env.NOTION_BLOG_DB_ID
             // filter: filter
         });
-        console.log(blog);
+        // console.log(blog)
     }
     catch (error) {
         if (error.code === APIErrorCode.ObjectNotFound) {
@@ -61,6 +61,8 @@ getPublishedpages().then((query) => __awaiter(void 0, void 0, void 0, function* 
         const pageBlocks = getPageBlocks(page.id);
         return pageBlocks;
     }));
-    getPages().then(results => console.log(JSON.stringify(results)));
+    getPages().then(results => {
+        // console.log(JSON.stringify(results))
+    });
 }));
 //# sourceMappingURL=notion.so.js.map

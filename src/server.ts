@@ -11,7 +11,7 @@ require('./clients/notion.so')
 
 const app = express()
 
-const publicPath = path.resolve(__dirname, 'public')
+const publicPath = path.resolve(__dirname, '../public')
 
 app.use(cors())
 /**
@@ -40,6 +40,7 @@ app.use((req: any, res: any, next: any) => {
   return next()
 })
 
+
 app.use(
   '/graphql',
   graphqlHTTP({
@@ -47,7 +48,9 @@ app.use(
     graphiql: true
   })
 )
-
+app.get('', (req, res) => {
+  res.sendFile(path.join(publicPath, 'index.html'))
+})
 /**
  * Posts a request to delete any identifying information for a user - email, name, comments
  */

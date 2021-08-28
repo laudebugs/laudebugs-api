@@ -28,7 +28,7 @@
   "scripts": {
     "start": "node ./dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "run:dev": "npx concurrently \"tsc -w\" \"nodemon ./dist/server.js\"",
+    "dev": "npx concurrently \"tsc -w\" \"nodemon ./dist/server.js\"",
     "build": "tsc"
   },
   "author": "",

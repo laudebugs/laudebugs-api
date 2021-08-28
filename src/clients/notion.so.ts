@@ -6,7 +6,7 @@ export const notion = new Client({
 })
 const doSth = async () => {
   const listUsersResponse = await notion.users.list()
-  console.log(listUsersResponse)
+  // console.log(listUsersResponse)
 }
 // doSth()
 
@@ -22,8 +22,8 @@ const getBlog = async () => {
       database_id: process.env.NOTION_BLOG_DB_ID
       // filter: filter
     })
-    console.log(blog)
-  } catch (error) {
+    // console.log(blog)
+  } catch (error:any) {
     if (error.code === APIErrorCode.ObjectNotFound) {
       //
       // For example: handle by asking the user to select a different database
@@ -53,5 +53,7 @@ getPublishedpages().then(async query => {
         return pageBlocks
       })
     )
-  getPages().then(results => console.log(JSON.stringify(results)))
+  getPages().then(results => {
+    // console.log(JSON.stringify(results))
+  })
 })
