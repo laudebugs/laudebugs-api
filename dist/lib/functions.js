@@ -39,7 +39,7 @@ const githubUrl = "https://api.github.com/graphql";
 const oauth = { Authorization: "bearer " + process.env.GH_TOKEN };
 const query = `
            {
-             repository(owner: "lbugasu", name: "articles") {
+             repository(owner: "laudebugs", name: "articles") {
                defaultBranchRef {
                  target {
                    ... on Commit {
